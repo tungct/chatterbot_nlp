@@ -1,0 +1,11 @@
+Trường hợp cần xây dựng luật thêm :
+
+Ad cho hỏi 3/3 thời tiết Ninh Bình thế nào ạ
+
+=> tách sai
+
+Những trường hợp về nhiều từ liên tiếp cùng tag => ghép lại
+
+// intend của Linh : Ninh Bình ngày 14 mưa đúng k ad ơi  => ra 4, sai
+Đợt rét này kéo dài lâu ko ad? => ra 4, sai
+17 18 sapa mưa ko ad ới ơi... => {'TIME': ['17 18 sapa'], 'LOC': [], 'WEATHER': ['mưa']} => sai

@@ -1,30 +1,6 @@
 import pycrfsuite
 from pyvi.pyvi import ViTokenizer, ViPosTagger
 
-# with open('test.txt', 'r') as f:
-#     tf = f.read().splitlines()
-# l = []
-# ar = []
-# for i in range(len(tf)):
-#     if tf[i] != "":
-#         a = tf[i].split(' ')
-#         l.append(tuple(a))
-# ar.append(l)
-# print(ar)
-
-with open('predict.txt', 'r') as f:
-    tf = f.read()
-    text = ViPosTagger.postagging(ViTokenizer.tokenize(tf))
-    test = []
-    ar = []
-    for i in range(len(text[0])):
-        l = []
-        l.append(text[0][i])
-        l.append(text[1][i])
-        ar.append(tuple(l))
-    test.append(ar)
-
-
 def word2features(sent, i):
     word = sent[i][0]
     postag = sent[i][1]
@@ -78,26 +54,28 @@ def sent2labels(sent):
 def sent2tokens(sent):
     return [token for token, postag, label in sent]
 
-test_sents = test
+def ner_crf(question):
+    text = ViPosTagger.postagging(ViTokenizer.tokenize(question))
+    detect = []
+    ar = []
+    for i in range(len(text[0])):
+        l = []
+        l.append(text[0][i])
+        l.append(text[1][i])
+        ar.append(tuple(l))
+    detect.append(ar)
+    X_detect = [sent2features(s) for s in detect]
+    tagger = pycrfsuite.Tagger()
+    tagger.open('crf.model')
+    y_detect = [tagger.tag(xseq) for xseq in X_detect]
+    pred = []
+    for i in range(len(detect[0])):
+        k = detect[0][i][0]
+        v = y_detect[0][i]
+        kv = []
+        kv.append(k)
+        kv.append(v)
+        pred.append(tuple(kv))
+    return pred
 
-X_test = [sent2features(s) for s in test_sents]
-
-
-tagger = pycrfsuite.Tagger()
-tagger.open('crf.model')
-y_pred = [tagger.tag(xseq) for xseq in X_test]
-
-# Let's take a look at a random sample in the testing set
-i = 12
-# print(test_sents)
-# print(y_pred)
-
-pred = []
-for i in range(len(test_sents[0])):
-    k = test_sents[0][i][0]
-    v = y_pred[0][i]
-    kv = []
-    kv.append(k)
-    kv.append(v)
-    pred.append(tuple(kv))
-print(pred)
+print(ner_crf("Ngày mai Hà nội có mưa không"))
