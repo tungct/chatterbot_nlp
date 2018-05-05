@@ -7,7 +7,7 @@ def write(data, outfile):
     pickle.dump(data, f)
     f.close()
 
-with open('tag_test_no_accent.txt', 'r') as f:
+with open('tag_no_accent.txt', 'r') as f:
     trf = f.read().splitlines()
 ls = []
 arr = []
@@ -21,18 +21,6 @@ for i in range(len(trf)):
 arr.append(ls)
 
 train_sents = arr
-
-with open('predict.txt', 'r') as f:
-    tf = f.read().splitlines()
-l = []
-ar = []
-for i in range(len(tf)):
-    if tf[i] != "":
-        a = tf[i].split(' ')
-        l.append(tuple(a))
-ar.append(l)
-
-test_sents = ar
 
 def word2features(sent, i):
     word = sent[i][0]
@@ -87,8 +75,6 @@ def get_labels(doc):
 
 X_train = [extract_features(doc) for doc in train_sents]
 y_train = [get_labels(doc) for doc in train_sents]
-#
-X_test = [extract_features(s) for s in test_sents]
 
 
 crf = sklearn_crfsuite.CRF(
@@ -102,10 +88,6 @@ crf.fit(X_train, y_train)
 
 labels = list(crf.classes_)
 labels.remove('O')
-
-y_pred = crf.predict(test_sents)
-
-print(crf.predict_single(test_sents[0][0]))
 
 trainer = pycrfsuite.Trainer(verbose=True)
 

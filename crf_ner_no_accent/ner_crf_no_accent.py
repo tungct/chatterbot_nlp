@@ -1,5 +1,24 @@
+import re
 import pycrfsuite
 from pyvi.pyvi import ViTokenizer, ViPosTagger
+
+def no_accent_vietnamese(s):
+    s = re.sub(u'[àáạảãâầấậẩẫăằắặẳẵ]', 'a', s)
+    s = re.sub(u'[ÀÁẠẢÃĂẰẮẶẲẴÂẦẤẬẨẪ]', 'A', s)
+    s = re.sub(u'[èéẹẻẽêềếệểễ]', 'e', s)
+    s = re.sub(u'[ÈÉẸẺẼÊỀẾỆỂỄ]', 'E', s)
+    s = re.sub(u'[òóọỏõôồốộổỗơờớợởỡ]', 'o', s)
+    s = re.sub(u'[ÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠ]', 'O', s)
+    s = re.sub(u'[ìíịỉĩ]', 'i', s)
+    s = re.sub(u'[ÌÍỊỈĨ]', 'I', s)
+    s = re.sub(u'[ùúụủũưừứựửữ]', 'u', s)
+    s = re.sub(u'[ƯỪỨỰỬỮÙÚỤỦŨ]', 'U', s)
+    s = re.sub(u'[ỳýỵỷỹ]', 'y', s)
+    s = re.sub(u'[ỲÝỴỶỸ]', 'Y', s)
+    s = re.sub(u'[Đ]', 'D', s)
+    s = re.sub(u'[đ]', 'd', s)
+    return s
+
 
 def word2features(sent, i):
     word = sent[i][0]
@@ -55,31 +74,6 @@ def sent2tokens(sent):
     return [token for token, postag, label in sent]
 
 def ner_crf(question):
-    text = ViPosTagger.postagging(ViTokenizer.tokenize(question))
-    print(text)
-    detect = []
-    ar = []
-    for i in range(len(text[0])):
-        l = []
-        l.append(text[0][i])
-        l.append(text[1][i])
-        ar.append(tuple(l))
-    detect.append(ar)
-    X_detect = [sent2features(s) for s in detect]
-    tagger = pycrfsuite.Tagger()
-    tagger.open('crf.model')
-    y_detect = [tagger.tag(xseq) for xseq in X_detect]
-    pred = []
-    for i in range(len(detect[0])):
-        k = detect[0][i][0]
-        v = y_detect[0][i]
-        kv = []
-        kv.append(k)
-        kv.append(v)
-        pred.append(tuple(kv))
-    return pred
-
-def predict(question):
     text = ViPosTagger.postagging(question)
     detect = []
     ar = []
@@ -103,4 +97,4 @@ def predict(question):
         pred.append(tuple(kv))
     return pred
 
-print(predict("ngay mai o ha noi co mua khong a"))
+print(ner_crf("ha noi ngay mai lieu co mua a"))
