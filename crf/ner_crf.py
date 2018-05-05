@@ -77,5 +77,3 @@ def ner_crf(question):
         kv.append(v)
         pred.append(tuple(kv))
     return pred
-
-print(ner_crf("Ngày mai Hà nội có mưa không"))

@@ -1,20 +1,13 @@
-import nltk
-import sklearn
-import scipy.stats
-from sklearn.metrics import make_scorer
 import pickle
-import pycrfsuite
 import sklearn_crfsuite
-from sklearn_crfsuite import scorers
-from sklearn_crfsuite import metrics
-
+import pycrfsuite
 
 def write(data, outfile):
     f = open(outfile, "w+b")
     pickle.dump(data, f)
     f.close()
 
-with open('tag_vtv.txt', 'r') as f:
+with open('tag.txt', 'r') as f:
     trf = f.read().splitlines()
 ls = []
 arr = []
@@ -22,21 +15,13 @@ arr = []
 for i in range(len(trf)):
     if trf[i] != "":
         a = trf[i].split(' ')
-        # print(i)
-        # if len(a)> 3:
-        #     print(a[0] + " " + a[1] + " " + a[2])
-        #     print(i)
         if len(a) != 3:
             print(a[0] + " " + a[1])
-        # del a[1]
-        # if a[0] == '' or a[1] == '' or a[2] == '':
-        #     print(a)
         ls.append(tuple(a))
 arr.append(ls)
 
-# print(nltk.corpus.conll2002.fileids())
 train_sents = arr
-#
+
 with open('predict.txt', 'r') as f:
     tf = f.read().splitlines()
 l = []
@@ -44,15 +29,10 @@ ar = []
 for i in range(len(tf)):
     if tf[i] != "":
         a = tf[i].split(' ')
-        # del a[1]
-        # if a[0] == '' or a[1] == '' or a[2] == '':
-        #     print(a)
         l.append(tuple(a))
 ar.append(l)
 
 test_sents = ar
-
-# test_sents = list(nltk.corpus.conll2002.iob_sents('esp.testb'))
 
 def word2features(sent, i):
     word = sent[i][0]
@@ -122,15 +102,11 @@ crf.fit(X_train, y_train)
 
 labels = list(crf.classes_)
 labels.remove('O')
-#
-# write(crf, "trains.file")
 
 y_pred = crf.predict(test_sents)
 
-# print(y_pred)
-print("XXX")
 print(crf.predict_single(test_sents[0][0]))
-import pycrfsuite
+
 trainer = pycrfsuite.Trainer(verbose=True)
 
 # Submit training data to the trainer
@@ -158,23 +134,5 @@ trainer.set_params({
 trainer.train('crf.model')
 tagger = pycrfsuite.Tagger()
 tagger.open('crf.model')
-# print(y_pred)
-print("XXX")
-y_pred = [tagger.tag(xseq) for xseq in X_test]
 
-# Let's take a look at a random sample in the testing set
-i = 12
-# print(y_pred)
-# for x, y in zip(y_pred[i], [x[1].split("=")[1] for x in X_test[i]]):
-#     print("%s (%s)" % (y, x))
-# print(crf.predict_marginals(X_test))
-# print(metrics.flat_f1_score(y_test, y_pred,
-#                       average='weighted', labels=labels))
-# # group B and I results
-# sorted_labels = sorted(
-#     labels,
-#     key=lambda name: (name[1:], name[0])
-# )
-# print(metrics.flat_classification_report(
-#     y_test, y_pred, labels=sorted_labels, digits=3
-# ))
+
